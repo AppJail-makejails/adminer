@@ -2,7 +2,7 @@
 
 Adminer is a full-featured database management tool in a single PHP file. Supports MySQL, SQLite and PostgreSQL.
 
-<img src="https://i.imgur.com/jACJwqR.png" width="80%" height="auto">
+<img src="https://i.imgur.com/jACJwqR.png" width="30%" height="auto">
 
 adminer.org
 
