@@ -106,9 +106,6 @@ login-password-less
 [00:00:02] [ debug ] [adminer] custom:list_installed_plugins() exits with status code 0
 [00:00:02] [ debug ] [adminer] `/usr/local/appjail/jails/adminer/init` exits with status code 0
 ```
-
-**Note**: Although the `plugin.php` plugin is actually installed, it is not listed here and cannot be removed using the following custom stage.
-
 **Remove a plugin**:
 
 ```
@@ -188,8 +185,7 @@ This Makejail uses the PHP file from [adminer.org/plugins/#use](https://www.admi
 ├── plugins
 │   ├── drivers
 │   │   └── index.php
-│   ├── index.php
-│   └── plugin.php
+│   └── index.php
 └── plugins.php
 
 3 directories, 8 files

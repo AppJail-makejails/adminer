@@ -99,7 +99,7 @@ RAW else
 	VAR --make-arg-env wwwdir=/usr/local/www/adminer
 RAW fi
 
-CMD find ${wwwdir}/plugins -name '*.php' ! -name 'index.php' ! -name 'plugin.php' -maxdepth 1 -exec basename {} \; | sed -Ee 's/^(.+)\.php$/\1/'
+CMD find ${wwwdir}/plugins -name '*.php' ! -name 'index.php' -maxdepth 1 -exec basename {} \; | sed -Ee 's/^(.+)\.php$/\1/'
 
 STAGE custom:add_plugin
 
