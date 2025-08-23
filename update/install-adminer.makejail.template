@@ -5,6 +5,7 @@ PKG git-tiny
 # Plugins & Designs
 CMD git clone --depth 1 --branch "v${adminer_version}" https://github.com/vrana/adminer.git /tmp/adminer
 CMD mkdir -p /adminer
+CMD fetch -o /tmp/plugin.php https://raw.githubusercontent.com/vrana/adminer/refs/tags/v5.1.1/plugins/plugin.php
 CMD mv /tmp/adminer/plugins /adminer
 CMD mv /tmp/adminer/designs /adminer
 CMD rm -rf /tmp/adminer
