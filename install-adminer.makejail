@@ -1,0 +1,16 @@
+ARG adminer_version=5.3.0
+
+PKG git-tiny
+
+# Plugins & Designs
+CMD git clone --depth 1 --branch "v${adminer_version}" https://github.com/vrana/adminer.git /tmp/adminer
+CMD mkdir -p /adminer
+CMD mv /tmp/adminer/plugins /adminer
+CMD mv /tmp/adminer/designs /adminer
+CMD rm -rf /tmp/adminer
+PKG --remove git-tiny
+PKG --autoremove
+# Admine
+CMD fetch -o /tmp/adminer.php "https://github.com/vrana/adminer/releases/download/v${adminer_version}/adminer-${adminer_version}.php"
+
+INCLUDE pkgs.makejail

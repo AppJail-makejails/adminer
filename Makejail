@@ -1,0 +1,165 @@
+INCLUDE options/options.makejail
+
+ARG adminer_plugins?
+ARG adminer_design?
+ARG adminer_php_type=production
+ARG adminer_upload_limit=128M
+ARG adminer_memory_limit=1G
+ARG adminer_max_execution_time=600
+ARG adminer_session_save_path=/sessions
+ARG adminer_tz=UTC
+ARG adminer_ajspec=gh+AppJail-makejails/adminer
+# Tag
+ARG adminer_tag=13.5-apache
+
+FROM --entrypoint "${adminer_ajspec}" adminer:${adminer_tag}
+
+RAW if appjail cmd jexec "${APPJAIL_JAILNAME}" [ -d "/usr/local/www/apache24/data" ]; then
+	RAW case "${adminer_php_type}" in
+	RAW 	development|production) ;;
+	RAW 	*) echo "VALID TYPES: development, production"; exit 1
+	RAW esac
+
+	# This symlink is only created for apache as php-fpm Makejail already has
+	# this feature.
+	CMD ln -s /usr/local/etc/php.ini-${adminer_php_type} /usr/local/etc/php.ini
+
+	SERVICE apache24 restart
+
+	VAR --make-arg-env wwwdir=/usr/local/www/apache24/data
+RAW else
+	VAR --make-arg-env wwwdir=/usr/local/www/adminer
+RAW fi
+
+RAW if [ -n "${adminer_plugins}" ]; then
+	CMD for plugin in ${adminer_plugins}; do \
+		if [ "`basename -- \"${plugin}\"`" != "${plugin}" ] || \
+				[ ! -f "/adminer/plugins/${plugin}.php" ]; then \
+			echo "###> '${plugin}' Plugin not found. <###"; \
+			exit 1; \
+		fi; \
+		echo "======> Installing plugin '${plugin}' ... <======"; \
+		cp /adminer/plugins/${plugin}.php ${wwwdir}/plugins; \
+	    done
+RAW fi
+
+RAW if [ -n "${adminer_design}" ]; then
+	CMD if [ "`basename -- \"${adminer_design}\"`" != "${adminer_design}" ] || \
+			[ ! -f "/adminer/designs/${adminer_design}/adminer.css" ]; then \
+		echo "###> '${adminer_design}' Design not found. <###"; \
+		exit 1; \
+	    fi; \
+	    echo "======> Installing design '${adminer_design}' ... <======"; \
+	    cp /adminer/designs/${adminer_design}/adminer.css ${wwwdir}/adminer.css
+RAW fi
+
+VAR --make-arg-env phpdir=/usr/local/etc/php
+
+CMD echo "======> Copying required .ini files ... <======"
+
+COPY --verbose files/session-strict.ini ${phpdir}
+COPY --verbose files/adminer-misc.ini ${phpdir}
+
+CMD echo "======> Configuring adminer-misc.ini ... <======"
+
+RAW if ! printf "%s" "${adminer_upload_limit}" | grep -qEe '^[0-9]+[KMG]$'; then
+RAW 	echo "###> '${adminer_upload_limit}' Invalid upload limit. <###"
+RAW 	exit 1
+RAW fi
+
+RAW if ! printf "%s" "${adminer_memory_limit}" | grep -qEe '^[0-9]+[KMG]$'; then
+RAW 	echo "###> '${adminer_memory_limit}' Invalid memory limit. <###"
+RAW 	exit 1
+RAW fi
+
+RAW if ! printf "%s" "${adminer_max_execution_time}" | grep -qEe '^[0-9]+$'; then
+RAW 	echo "###> '${adminer_max_execution_time}' Invalid max. execution time. <###"
+RAW 	exit 1
+RAW fi
+
+REPLACE ${phpdir}/adminer-misc.ini UPLOAD_LIMIT ${adminer_upload_limit}
+REPLACE ${phpdir}/adminer-misc.ini MEMORY_LIMIT ${adminer_memory_limit}
+REPLACE ${phpdir}/adminer-misc.ini MAX_EXECUTION_TIME ${adminer_max_execution_time}
+REPLACE ${phpdir}/adminer-misc.ini SESSION_SAVE_PATH ${adminer_session_save_path}
+REPLACE ${phpdir}/adminer-misc.ini TZ ${adminer_tz}
+
+CMD echo "======> Creating directory for session.save_path ... <======"
+CMD mkdir -p "${adminer_session_save_path}"
+CMD chown www:www "${adminer_session_save_path}"
+
+STAGE custom:list_plugins
+
+CMD find /adminer/plugins -name '*.php' -exec basename {} \; | sed -Ee 's/^(.+)\.php$/\1/'
+
+STAGE custom:list_installed_plugins
+
+RAW if appjail cmd jexec "${APPJAIL_JAILNAME}" [ -d "/usr/local/www/apache24/data" ]; then
+	VAR --make-arg-env wwwdir=/usr/local/www/apache24/data
+RAW else
+	VAR --make-arg-env wwwdir=/usr/local/www/adminer
+RAW fi
+
+CMD find ${wwwdir}/plugins -name '*.php' ! -name 'index.php' ! -name 'plugin.php' -maxdepth 1 -exec basename {} \; | sed -Ee 's/^(.+)\.php$/\1/'
+
+STAGE custom:add_plugin
+
+ARG plugin
+
+CMD if [ "`basename -- \"${plugin}\"`" != "${plugin}" ] || \
+			[ ! -f "/adminer/plugins/${plugin}.php" ]; then \
+		echo "###> '${plugin}' Plugin not found. <###"; \
+		exit 1; \
+	fi; \
+	if [ -d "/usr/local/www/apache24/data" ]; then \
+		cp /adminer/plugins/${plugin}.php /usr/local/www/apache24/data/plugins; \
+	else \
+		cp /adminer/plugins/${plugin}.php /usr/local/www/adminer/plugins; \
+	fi
+
+STAGE custom:remove_plugin
+
+ARG plugin
+
+CMD if [ "`basename -- \"${plugin}\"`" != "${plugin}" ] || \
+		[ "${plugin}" = "index" ] || \
+		[ "${plugin}" = "plugin" ] || \
+		[ ! -f "/usr/local/www/apache24/data/plugins/${plugin}.php" ] && \
+		[ ! -f "/usr/local/www/adminer/plugins/${plugin}.php" ]; then \
+	echo "###> '${plugin}' This plugin is not installed. <###"; \
+	exit 1; \
+    fi; \
+    if [ -d "/usr/local/www/apache24/data" ]; then \
+    	rm -f /usr/local/www/apache24/data/plugins/${plugin}.php; \
+    else \
+    	rm -f /usr/local/www/adminer/plugins/${plugin}.php; \
+    fi
+
+STAGE custom:list_designs
+
+CMD find /adminer/designs -type d -mindepth 1 -maxdepth 1 -exec basename {} \;
+
+STAGE custom:change_design
+
+ARG design
+
+CMD if [ "`basename -- \"${design}\"`" != "${design}" ] || \
+		[ ! -f "/adminer/designs/${design}/adminer.css" ]; then \
+	echo "###> '${design}' Design not found. <###"; \
+	exit 1; \
+    fi; \
+    if [ -d "/usr/local/www/apache24/data" ]; then \
+    	cp /adminer/designs/${design}/adminer.css /usr/local/www/apache24/data/adminer.css; \
+    else \
+    	cp /adminer/designs/${design}/adminer.css /usr/local/www/adminer/adminer.css; \
+    fi
+
+STAGE custom:remove_design
+
+CMD if [ -f "/usr/local/www/apache24/data/adminer.css" ]; then \
+	rm -f /usr/local/www/apache24/data/adminer.css; \
+    elif [ -f "/usr/local/www/adminer/adminer.css" ]; then \
+	rm -f /usr/local/www/adminer/adminer.css; \
+    else \
+	echo "###> There is currently no design. <###"; \
+	exit 1; \
+    fi

@@ -1,0 +1,3 @@
+OPTION volume=adminer-plugins-file mountpoint:usr/local/www/adminer/plugins.php
+OPTION volume=adminer-plugins mountpoint:/usr/local/www/adminer/plugins
+OPTION volume=adminer-drivers mountpoint:/usr/local/www/adminer/plugins/drivers
