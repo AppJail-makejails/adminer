@@ -10,7 +10,7 @@ CMD mv /tmp/adminer/designs /adminer
 CMD rm -rf /tmp/adminer
 PKG --remove git-tiny
 PKG --autoremove
-# Admine
+# Adminer
 CMD fetch -o /tmp/adminer.php "https://github.com/vrana/adminer/releases/download/v${adminer_version}/adminer-${adminer_version}.php"
 
 INCLUDE pkgs.makejail
