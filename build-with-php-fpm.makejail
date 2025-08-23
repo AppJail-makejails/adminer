@@ -5,3 +5,4 @@ INCLUDE install-adminer.makejail
 CMD mkdir -p /usr/local/www/adminer
 COPY struct/ /usr/local/www/adminer
 CMD mv /tmp/adminer.php /usr/local/www/adminer
+CMD mv /tmp/plugin.php /usr/local/www/adminer/plugins
