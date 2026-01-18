@@ -10,7 +10,7 @@ ARG adminer_session_save_path=/sessions
 ARG adminer_tz=UTC
 ARG adminer_ajspec=gh+AppJail-makejails/adminer
 # Tag
-ARG adminer_tag=13.5-apache
+ARG adminer_tag=14.3-apache
 
 FROM --entrypoint "${adminer_ajspec}" adminer:${adminer_tag}
 

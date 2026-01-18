@@ -203,7 +203,7 @@ You can also easily put your `adminer.css` alongside `adminer.php`.
 
 ### Arguments
 
-* `adminer_tag` (default: `13.5-apache`): See [#tags](#tags).
+* `adminer_tag` (default: `14.3-apache`): See [#tags](#tags).
 * `adminer_ajspec` (default: `gh+AppJail-makejails/adminer`): Entry point where the `appjail-ajspec(5)` file is located.
 * `adminer_plugins` (optional): A space-separated list of plugins to be added.
 * `adminer_design` (optional): Design to be used.
@@ -236,10 +236,10 @@ You can also easily put your `adminer.css` alongside `adminer.php`.
 
 | Tag                              | Arch    | Version            | Type   | `adminer_version` |
 | -------------------------------- | ------- | ------------------ | ------ | -------------------- |
-| `13.5-apache` | `amd64` | `13.5-RELEASE` | `thin` | `5.3.0`        |
-| `13.5-fpm`    | `amd64` | `13.5-RELEASE` | `thin` | `5.3.0`        |
 | `14.3-apache` | `amd64` | `14.3-RELEASE` | `thin` | `5.3.0`        |
 | `14.3-fpm`    | `amd64` | `14.3-RELEASE` | `thin` | `5.3.0`        |
+| `15-apache` | `amd64` | `15` | `thin` | `5.3.0`        |
+| `15-fpm`    | `amd64` | `15` | `thin` | `5.3.0`        |
 
 ## Notes
 

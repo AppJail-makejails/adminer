@@ -238,8 +238,8 @@ You can also easily put your `adminer.css` alongside `adminer.php`.
 | -------------------------------- | ------- | ------------------ | ------ | -------------------- |
 | `%%TAG1%%-apache` | `amd64` | `%%TAG1%%-RELEASE` | `thin` | `%%VERSION%%`        |
 | `%%TAG1%%-fpm`    | `amd64` | `%%TAG1%%-RELEASE` | `thin` | `%%VERSION%%`        |
-| `%%TAG2%%-apache` | `amd64` | `%%TAG2%%-RELEASE` | `thin` | `%%VERSION%%`        |
-| `%%TAG2%%-fpm`    | `amd64` | `%%TAG2%%-RELEASE` | `thin` | `%%VERSION%%`        |
+| `%%TAG2%%-apache` | `amd64` | `%%TAG2%%` | `thin` | `%%VERSION%%`        |
+| `%%TAG2%%-fpm`    | `amd64` | `%%TAG2%%` | `thin` | `%%VERSION%%`        |
 
 ## Notes
 
